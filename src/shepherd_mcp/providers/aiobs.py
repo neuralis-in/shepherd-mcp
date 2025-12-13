@@ -1,67 +1,29 @@
-"""AIOBS API client for Shepherd MCP."""
+"""AIOBS provider client for Shepherd MCP."""
 
 from __future__ import annotations
 
 import os
 from datetime import datetime
-from pathlib import Path
 
 import httpx
 
-from shepherd_mcp.models import (
+from shepherd_mcp.models.aiobs import (
     Event,
     FunctionEvent,
     Session,
     SessionsResponse,
 )
-
-
-def _load_dotenv() -> None:
-    """Load environment variables from .env file.
-
-    Searches current directory and parent directories for a .env file.
-    Only sets variables that aren't already in the environment.
-    """
-    for directory in [Path.cwd()] + list(Path.cwd().parents):
-        env_file = directory / ".env"
-        if env_file.exists():
-            with open(env_file) as f:
-                for line in f:
-                    line = line.strip()
-                    if line and not line.startswith("#") and "=" in line:
-                        key, _, value = line.partition("=")
-                        key = key.strip()
-                        value = value.strip().strip('"').strip("'")
-                        if key and key not in os.environ:
-                            os.environ[key] = value
-            break
-
-
-# Auto-load .env file on module import
-_load_dotenv()
+from shepherd_mcp.providers.base import (
+    AuthenticationError,
+    BaseProvider,
+    NotFoundError,
+    ProviderError,
+)
 
 DEFAULT_ENDPOINT = "https://shepherd-api-48963996968.us-central1.run.app"
 
 
-class AIOBSError(Exception):
-    """Base exception for AIOBS errors."""
-
-    pass
-
-
-class AuthenticationError(AIOBSError):
-    """Authentication failed."""
-
-    pass
-
-
-class SessionNotFoundError(AIOBSError):
-    """Session not found."""
-
-    pass
-
-
-class AIOBSClient:
+class AIOBSClient(BaseProvider):
     """Client for AIOBS API."""
 
     def __init__(self, api_key: str | None = None, endpoint: str | None = None) -> None:
@@ -81,6 +43,11 @@ class AIOBSClient:
         self.endpoint = (endpoint or os.environ.get("AIOBS_ENDPOINT", DEFAULT_ENDPOINT)).rstrip("/")
         self._client = httpx.Client(timeout=30.0)
 
+    @property
+    def name(self) -> str:
+        """Return the provider name."""
+        return "aiobs"
+
     def _handle_error_response(self, response: httpx.Response) -> None:
         """Handle error responses from the API."""
         if response.status_code == 401:
@@ -95,14 +62,14 @@ class AIOBSClient:
                 detail = response.json().get("detail", "Not found")
             except Exception:
                 detail = "Not found"
-            raise SessionNotFoundError(detail)
+            raise NotFoundError(detail)
 
         if response.status_code >= 400:
             try:
                 detail = response.json().get("detail", f"HTTP {response.status_code}")
             except Exception:
                 detail = f"HTTP {response.status_code}"
-            raise AIOBSError(detail)
+            raise ProviderError(detail)
 
     def list_sessions(self) -> SessionsResponse:
         """List all sessions.
@@ -147,7 +114,7 @@ class AIOBSClient:
 
 
 # ============================================================================
-# Filtering utilities (ported from shepherd-cli)
+# Filtering utilities
 # ============================================================================
 
 
@@ -357,4 +324,3 @@ def filter_sessions(
         generated_at=response.generated_at,
         version=response.version,
     )
-

@@ -1,4 +1,7 @@
-"""Pydantic models for Shepherd MCP."""
+"""AIOBS-specific models.
+
+These models represent the data structures for the Shepherd/AIOBS backend.
+"""
 
 from __future__ import annotations
 
@@ -123,4 +126,3 @@ class SessionsResponse(BaseModel):
     enh_prompt_traces: list[Any] = Field(default_factory=list)
     generated_at: float = 0
     version: int = 1
-

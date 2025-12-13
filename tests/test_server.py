@@ -1,8 +1,6 @@
 """Tests for the Shepherd MCP server."""
 
-import pytest
-
-from shepherd_mcp.models import Event, FunctionEvent, Session, SessionsResponse
+from shepherd_mcp.models.aiobs import Event, Session
 from shepherd_mcp.server import (
     calc_avg_latency,
     calc_total_tokens,
@@ -466,9 +464,7 @@ class TestExtractResponses:
             provider="anthropic",
             response={
                 "model": "claude-3",
-                "content": [
-                    {"type": "tool_use", "name": "calculator", "input": {"expr": "2+2"}}
-                ],
+                "content": [{"type": "tool_use", "name": "calculator", "input": {"expr": "2+2"}}],
             },
         )
         result = extract_responses([event])
@@ -534,4 +530,3 @@ class TestCompareResponses:
         assert result["session1"]["summary"]["stop_reasons"]["stop"] == 2
         assert result["session1"]["summary"]["stop_reasons"]["length"] == 1
         assert result["session2"]["summary"]["stop_reasons"]["tool_calls"] == 1
-

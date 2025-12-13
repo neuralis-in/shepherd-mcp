@@ -348,6 +348,21 @@ export LANGFUSE_SECRET_KEY=sk-lf-xxxx
 python -m shepherd_mcp
 ```
 
+### Publishing to PyPI
+
+Releases are automatically published to PyPI via GitHub Actions when a release is created.
+
+To publish manually:
+
+```bash
+# Build the package
+pip install build twine
+python -m build
+
+# Upload to PyPI
+twine upload dist/*
+```
+
 ## Architecture
 
 ```

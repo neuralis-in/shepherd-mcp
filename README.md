@@ -130,14 +130,25 @@ Search and filter sessions with multiple criteria.
 
 ### `diff_sessions`
 
-Compare two sessions and show their differences.
+Compare two sessions and show their differences including:
+- **Metadata**: Duration, labels, timestamps
+- **LLM calls**: Count, tokens (input/output/total), average latency, errors
+- **Provider/Model distribution**: Which providers and models were used
+- **Function events**: Total calls, unique functions, function-specific counts
+- **Trace structure**: Trace depth, root nodes
+- **Evaluations**: Pass/fail counts and rates
+- **System prompts**: Compare system prompts across sessions, identify unique and common prompts
+- **Request parameters**: Temperature, max_tokens, tools used, streaming requests
+- **Response content**: Content length, tool calls, stop reasons
 
 **Parameters:**
 - `session_id_1` (required): First session UUID to compare
 - `session_id_2` (required): Second session UUID to compare
 
-**Example prompt:**
+**Example prompts:**
 > "Compare sessions abc123 and def456 and tell me what changed"
+> "Did the system prompt change between these two sessions?"
+> "Compare the request parameters between session abc and def"
 
 ## Use Cases
 

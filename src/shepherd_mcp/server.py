@@ -222,6 +222,324 @@ def get_function_counts(function_events: list[FunctionEvent]) -> dict[str, int]:
     return counts
 
 
+def extract_system_prompts(events: list[Event]) -> list[dict]:
+    """Extract system prompts from events."""
+    prompts = []
+    for i, event in enumerate(events):
+        if not event.request:
+            continue
+        messages = event.request.get("messages", [])
+        system_content = None
+
+        # Check for system message in messages array
+        for msg in messages:
+            if isinstance(msg, dict) and msg.get("role") == "system":
+                content = msg.get("content", "")
+                if isinstance(content, list):
+                    # Handle content blocks (e.g., Anthropic format)
+                    content = " ".join(
+                        block.get("text", "") for block in content if isinstance(block, dict)
+                    )
+                system_content = content
+                break
+
+        # Check for top-level system parameter (Anthropic style)
+        if not system_content:
+            system_content = event.request.get("system", "")
+
+        if system_content:
+            prompts.append(
+                {
+                    "index": i,
+                    "provider": event.provider,
+                    "model": event.request.get("model", "unknown"),
+                    "content": system_content[:500] + "..."
+                    if len(system_content) > 500
+                    else system_content,
+                    "full_length": len(system_content),
+                }
+            )
+    return prompts
+
+
+def compare_system_prompts(prompts1: list[dict], prompts2: list[dict]) -> dict:
+    """Compare system prompts between sessions."""
+    # Get unique prompts by content
+    set1 = {p["content"] for p in prompts1}
+    set2 = {p["content"] for p in prompts2}
+
+    return {
+        "session1": prompts1,
+        "session2": prompts2,
+        "unique_to_session1": list(set1 - set2),
+        "unique_to_session2": list(set2 - set1),
+        "common": list(set1 & set2),
+        "changed": len(set1) != len(set2) or set1 != set2,
+    }
+
+
+def extract_request_params(events: list[Event]) -> list[dict]:
+    """Extract request parameters from events."""
+    params_list = []
+    for i, event in enumerate(events):
+        if not event.request:
+            continue
+
+        params = {
+            "index": i,
+            "provider": event.provider,
+            "api": event.api,
+            "model": event.request.get("model", "unknown"),
+        }
+
+        # Common parameters across providers
+        param_keys = [
+            "temperature",
+            "max_tokens",
+            "top_p",
+            "top_k",
+            "frequency_penalty",
+            "presence_penalty",
+            "stop",
+            "stream",
+            "tools",
+            "tool_choice",
+            "response_format",
+        ]
+
+        for key in param_keys:
+            if key in event.request:
+                value = event.request[key]
+                # Summarize tools if present
+                if key == "tools" and isinstance(value, list):
+                    params[key] = [
+                        t.get("function", {}).get("name", "unknown")
+                        if isinstance(t, dict)
+                        else str(t)
+                        for t in value
+                    ]
+                else:
+                    params[key] = value
+
+        # Extract user message preview
+        messages = event.request.get("messages", [])
+        user_msgs = [m for m in messages if isinstance(m, dict) and m.get("role") == "user"]
+        if user_msgs:
+            last_user = user_msgs[-1]
+            content = last_user.get("content", "")
+            if isinstance(content, list):
+                content = " ".join(
+                    block.get("text", "")
+                    for block in content
+                    if isinstance(block, dict) and block.get("type") == "text"
+                )
+            params["user_message_preview"] = (
+                content[:200] + "..." if len(str(content)) > 200 else content
+            )
+
+        params_list.append(params)
+    return params_list
+
+
+def compare_request_params(params1: list[dict], params2: list[dict]) -> dict:
+    """Compare request parameters between sessions."""
+
+    def aggregate_params(params_list: list[dict]) -> dict:
+        agg: dict = {
+            "temperatures": [],
+            "max_tokens": [],
+            "models": [],
+            "tools_used": set(),
+            "stream_count": 0,
+        }
+        for p in params_list:
+            if "temperature" in p:
+                agg["temperatures"].append(p["temperature"])
+            if "max_tokens" in p:
+                agg["max_tokens"].append(p["max_tokens"])
+            agg["models"].append(p.get("model", "unknown"))
+            if "tools" in p:
+                agg["tools_used"].update(p["tools"])
+            if p.get("stream"):
+                agg["stream_count"] += 1
+        agg["tools_used"] = list(agg["tools_used"])
+        return agg
+
+    agg1 = aggregate_params(params1)
+    agg2 = aggregate_params(params2)
+
+    return {
+        "session1": {
+            "requests": params1,
+            "summary": {
+                "avg_temperature": sum(agg1["temperatures"]) / len(agg1["temperatures"])
+                if agg1["temperatures"]
+                else None,
+                "avg_max_tokens": sum(agg1["max_tokens"]) / len(agg1["max_tokens"])
+                if agg1["max_tokens"]
+                else None,
+                "tools_used": agg1["tools_used"],
+                "streaming_requests": agg1["stream_count"],
+            },
+        },
+        "session2": {
+            "requests": params2,
+            "summary": {
+                "avg_temperature": sum(agg2["temperatures"]) / len(agg2["temperatures"])
+                if agg2["temperatures"]
+                else None,
+                "avg_max_tokens": sum(agg2["max_tokens"]) / len(agg2["max_tokens"])
+                if agg2["max_tokens"]
+                else None,
+                "tools_used": agg2["tools_used"],
+                "streaming_requests": agg2["stream_count"],
+            },
+        },
+        "tools_added": list(set(agg2["tools_used"]) - set(agg1["tools_used"])),
+        "tools_removed": list(set(agg1["tools_used"]) - set(agg2["tools_used"])),
+    }
+
+
+def extract_responses(events: list[Event]) -> list[dict]:
+    """Extract response content from events."""
+    responses = []
+    for i, event in enumerate(events):
+        if not event.response:
+            continue
+
+        model = event.response.get("model")
+        if not model and event.request:
+            model = event.request.get("model", "unknown")
+        resp = {
+            "index": i,
+            "provider": event.provider,
+            "model": model or "unknown",
+            "duration_ms": event.duration_ms,
+        }
+
+        # Extract usage info
+        usage = event.response.get("usage", {})
+        if usage:
+            resp["tokens"] = {
+                "input": usage.get("prompt_tokens") or usage.get("input_tokens", 0),
+                "output": usage.get("completion_tokens") or usage.get("output_tokens", 0),
+                "total": usage.get("total_tokens", 0),
+            }
+
+        # Extract response content - handle different formats
+        content = None
+
+        # OpenAI format
+        choices = event.response.get("choices", [])
+        if choices and isinstance(choices, list):
+            first_choice = choices[0]
+            if isinstance(first_choice, dict):
+                message = first_choice.get("message", {})
+                content = message.get("content", "")
+                # Check for tool calls
+                tool_calls = message.get("tool_calls", [])
+                if tool_calls:
+                    resp["tool_calls"] = [
+                        {
+                            "name": tc.get("function", {}).get("name", "unknown"),
+                            "arguments_preview": str(
+                                tc.get("function", {}).get("arguments", "")
+                            )[:100],
+                        }
+                        for tc in tool_calls
+                        if isinstance(tc, dict)
+                    ]
+
+        # Anthropic format
+        if not content:
+            content_blocks = event.response.get("content", [])
+            if isinstance(content_blocks, list):
+                text_blocks = [
+                    b.get("text", "")
+                    for b in content_blocks
+                    if isinstance(b, dict) and b.get("type") == "text"
+                ]
+                content = " ".join(text_blocks)
+                # Check for tool use
+                tool_uses = [
+                    b
+                    for b in content_blocks
+                    if isinstance(b, dict) and b.get("type") == "tool_use"
+                ]
+                if tool_uses:
+                    resp["tool_calls"] = [
+                        {
+                            "name": tu.get("name", "unknown"),
+                            "arguments_preview": str(tu.get("input", ""))[:100],
+                        }
+                        for tu in tool_uses
+                    ]
+            elif isinstance(content_blocks, str):
+                content = content_blocks
+
+        # Direct text field
+        if not content:
+            content = event.response.get("text", "")
+
+        if content:
+            resp["content_preview"] = (
+                content[:300] + "..." if len(str(content)) > 300 else content
+            )
+            resp["content_length"] = len(str(content))
+
+        # Stop reason
+        stop_reason = event.response.get("stop_reason") or (
+            choices[0].get("finish_reason") if choices else None
+        )
+        if stop_reason:
+            resp["stop_reason"] = stop_reason
+
+        responses.append(resp)
+    return responses
+
+
+def compare_responses(responses1: list[dict], responses2: list[dict]) -> dict:
+    """Compare responses between sessions."""
+
+    def summarize_responses(resp_list: list[dict]) -> dict:
+        total_content_len = 0
+        tool_call_count = 0
+        stop_reasons: dict[str, int] = {}
+
+        for r in resp_list:
+            total_content_len += r.get("content_length", 0)
+            tool_call_count += len(r.get("tool_calls", []))
+            reason = r.get("stop_reason", "unknown")
+            stop_reasons[reason] = stop_reasons.get(reason, 0) + 1
+
+        return {
+            "total_content_length": total_content_len,
+            "avg_content_length": total_content_len / len(resp_list) if resp_list else 0,
+            "tool_call_count": tool_call_count,
+            "stop_reasons": stop_reasons,
+        }
+
+    summary1 = summarize_responses(responses1)
+    summary2 = summarize_responses(responses2)
+
+    return {
+        "session1": {
+            "responses": responses1,
+            "summary": summary1,
+        },
+        "session2": {
+            "responses": responses2,
+            "summary": summary2,
+        },
+        "delta": {
+            "avg_content_length": (
+                summary2["avg_content_length"] - summary1["avg_content_length"]
+            ),
+            "tool_call_count": (summary2["tool_call_count"] - summary1["tool_call_count"]),
+        },
+    }
+
+
 def compute_session_diff(session1: SessionsResponse, session2: SessionsResponse) -> dict:
     """Compute the diff between two sessions."""
     s1 = session1.sessions[0] if session1.sessions else None
@@ -275,6 +593,21 @@ def compute_session_diff(session1: SessionsResponse, session2: SessionsResponse)
     # Errors list
     errors_list1 = get_errors_list(session1.events, session1.function_events)
     errors_list2 = get_errors_list(session2.events, session2.function_events)
+
+    # System prompts comparison
+    system_prompts1 = extract_system_prompts(session1.events)
+    system_prompts2 = extract_system_prompts(session2.events)
+    system_prompts_comparison = compare_system_prompts(system_prompts1, system_prompts2)
+
+    # Request parameters comparison
+    request_params1 = extract_request_params(session1.events)
+    request_params2 = extract_request_params(session2.events)
+    request_params_comparison = compare_request_params(request_params1, request_params2)
+
+    # Responses comparison
+    responses1 = extract_responses(session1.events)
+    responses2 = extract_responses(session2.events)
+    responses_comparison = compare_responses(responses1, responses2)
 
     return {
         "metadata": {
@@ -353,6 +686,9 @@ def compute_session_diff(session1: SessionsResponse, session2: SessionsResponse)
             "pass_rate2": evals2["passed"] / evals2["total"] if evals2["total"] > 0 else 0,
         },
         "errors": {"session1": errors_list1, "session2": errors_list2},
+        "system_prompts": system_prompts_comparison,
+        "request_params": request_params_comparison,
+        "responses": responses_comparison,
     }
 
 
@@ -444,7 +780,7 @@ async def list_tools() -> list[Tool]:
         ),
         Tool(
             name="diff_sessions",
-            description="Compare two AI agent sessions and show their differences including metadata, LLM calls, tokens, latency, providers, models, functions, evaluations, and errors.",
+            description="Compare two AI agent sessions and show their differences including metadata, LLM calls, tokens, latency, providers, models, functions, evaluations, errors, system prompts, request parameters, and response content.",
             inputSchema={
                 "type": "object",
                 "properties": {

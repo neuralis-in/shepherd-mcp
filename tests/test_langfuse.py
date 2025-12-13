@@ -957,10 +957,18 @@ class TestHandleLangfuseSearchTraces:
             ),
         ]
 
+    @pytest.fixture
+    def mock_langfuse_client(self):
+        """Create a mock LangfuseClient that doesn't require API keys."""
+        with patch("shepherd_mcp.server.LangfuseClient") as mock_class:
+            mock_instance = Mock()
+            mock_class.return_value.__enter__ = Mock(return_value=mock_instance)
+            mock_class.return_value.__exit__ = Mock(return_value=False)
+            yield mock_instance
+
     @pytest.mark.asyncio
-    @patch.object(LangfuseClient, "list_traces")
-    async def test_search_with_text_query(self, mock_list_traces, sample_traces):
-        mock_list_traces.return_value = LangfuseTracesResponse(
+    async def test_search_with_text_query(self, mock_langfuse_client, sample_traces):
+        mock_langfuse_client.list_traces.return_value = LangfuseTracesResponse(
             data=sample_traces,
             meta={"page": 1, "limit": 50},
         )
@@ -975,9 +983,8 @@ class TestHandleLangfuseSearchTraces:
         assert data["filters_applied"]["query"] == "agent"
 
     @pytest.mark.asyncio
-    @patch.object(LangfuseClient, "list_traces")
-    async def test_search_with_release_filter(self, mock_list_traces, sample_traces):
-        mock_list_traces.return_value = LangfuseTracesResponse(
+    async def test_search_with_release_filter(self, mock_langfuse_client, sample_traces):
+        mock_langfuse_client.list_traces.return_value = LangfuseTracesResponse(
             data=sample_traces,
             meta={},
         )
@@ -991,9 +998,8 @@ class TestHandleLangfuseSearchTraces:
         assert data["traces"][0]["name"] == "chat-completion"
 
     @pytest.mark.asyncio
-    @patch.object(LangfuseClient, "list_traces")
-    async def test_search_with_min_cost_filter(self, mock_list_traces, sample_traces):
-        mock_list_traces.return_value = LangfuseTracesResponse(
+    async def test_search_with_min_cost_filter(self, mock_langfuse_client, sample_traces):
+        mock_langfuse_client.list_traces.return_value = LangfuseTracesResponse(
             data=sample_traces,
             meta={},
         )
@@ -1006,9 +1012,8 @@ class TestHandleLangfuseSearchTraces:
         assert data["total_matches"] == 2  # trace-2 (0.10) and trace-3 (0.20)
 
     @pytest.mark.asyncio
-    @patch.object(LangfuseClient, "list_traces")
-    async def test_search_with_max_cost_filter(self, mock_list_traces, sample_traces):
-        mock_list_traces.return_value = LangfuseTracesResponse(
+    async def test_search_with_max_cost_filter(self, mock_langfuse_client, sample_traces):
+        mock_langfuse_client.list_traces.return_value = LangfuseTracesResponse(
             data=sample_traces,
             meta={},
         )
@@ -1021,9 +1026,8 @@ class TestHandleLangfuseSearchTraces:
         assert data["total_matches"] == 1  # only trace-1 (0.05)
 
     @pytest.mark.asyncio
-    @patch.object(LangfuseClient, "list_traces")
-    async def test_search_with_min_latency_filter(self, mock_list_traces, sample_traces):
-        mock_list_traces.return_value = LangfuseTracesResponse(
+    async def test_search_with_min_latency_filter(self, mock_langfuse_client, sample_traces):
+        mock_langfuse_client.list_traces.return_value = LangfuseTracesResponse(
             data=sample_traces,
             meta={},
         )
@@ -1036,9 +1040,8 @@ class TestHandleLangfuseSearchTraces:
         assert data["total_matches"] == 1  # only trace-3 (5.0s)
 
     @pytest.mark.asyncio
-    @patch.object(LangfuseClient, "list_traces")
-    async def test_search_with_max_latency_filter(self, mock_list_traces, sample_traces):
-        mock_list_traces.return_value = LangfuseTracesResponse(
+    async def test_search_with_max_latency_filter(self, mock_langfuse_client, sample_traces):
+        mock_langfuse_client.list_traces.return_value = LangfuseTracesResponse(
             data=sample_traces,
             meta={},
         )
@@ -1051,9 +1054,8 @@ class TestHandleLangfuseSearchTraces:
         assert data["total_matches"] == 1  # only trace-1 (1.5s)
 
     @pytest.mark.asyncio
-    @patch.object(LangfuseClient, "list_traces")
-    async def test_search_with_combined_filters(self, mock_list_traces, sample_traces):
-        mock_list_traces.return_value = LangfuseTracesResponse(
+    async def test_search_with_combined_filters(self, mock_langfuse_client, sample_traces):
+        mock_langfuse_client.list_traces.return_value = LangfuseTracesResponse(
             data=sample_traces,
             meta={},
         )
@@ -1075,9 +1077,8 @@ class TestHandleLangfuseSearchTraces:
         assert data["filters_applied"]["release"] == "v1"
 
     @pytest.mark.asyncio
-    @patch.object(LangfuseClient, "list_traces")
-    async def test_search_passes_api_filters(self, mock_list_traces):
-        mock_list_traces.return_value = LangfuseTracesResponse(
+    async def test_search_passes_api_filters(self, mock_langfuse_client):
+        mock_langfuse_client.list_traces.return_value = LangfuseTracesResponse(
             data=[],
             meta={},
         )
@@ -1095,7 +1096,7 @@ class TestHandleLangfuseSearchTraces:
             }
         )
 
-        mock_list_traces.assert_called_once_with(
+        mock_langfuse_client.list_traces.assert_called_once_with(
             limit=25,
             page=2,
             name="my-trace",
@@ -1140,10 +1141,18 @@ class TestHandleLangfuseSearchSessions:
             ),
         ]
 
+    @pytest.fixture
+    def mock_langfuse_client(self):
+        """Create a mock LangfuseClient that doesn't require API keys."""
+        with patch("shepherd_mcp.server.LangfuseClient") as mock_class:
+            mock_instance = Mock()
+            mock_class.return_value.__enter__ = Mock(return_value=mock_instance)
+            mock_class.return_value.__exit__ = Mock(return_value=False)
+            yield mock_instance
+
     @pytest.mark.asyncio
-    @patch.object(LangfuseClient, "list_sessions")
-    async def test_search_with_text_query(self, mock_list_sessions, sample_sessions):
-        mock_list_sessions.return_value = LangfuseSessionsResponse(
+    async def test_search_with_text_query(self, mock_langfuse_client, sample_sessions):
+        mock_langfuse_client.list_sessions.return_value = LangfuseSessionsResponse(
             data=sample_sessions,
             meta={},
         )
@@ -1157,9 +1166,8 @@ class TestHandleLangfuseSearchSessions:
         assert data["sessions"][0]["id"] == "session-1"
 
     @pytest.mark.asyncio
-    @patch.object(LangfuseClient, "list_sessions")
-    async def test_search_with_user_id_filter(self, mock_list_sessions, sample_sessions):
-        mock_list_sessions.return_value = LangfuseSessionsResponse(
+    async def test_search_with_user_id_filter(self, mock_langfuse_client, sample_sessions):
+        mock_langfuse_client.list_sessions.return_value = LangfuseSessionsResponse(
             data=sample_sessions,
             meta={},
         )
@@ -1172,9 +1180,8 @@ class TestHandleLangfuseSearchSessions:
         assert data["total_matches"] == 2  # session-1 and session-3 have alice
 
     @pytest.mark.asyncio
-    @patch.object(LangfuseClient, "list_sessions")
-    async def test_search_with_min_traces_filter(self, mock_list_sessions, sample_sessions):
-        mock_list_sessions.return_value = LangfuseSessionsResponse(
+    async def test_search_with_min_traces_filter(self, mock_langfuse_client, sample_sessions):
+        mock_langfuse_client.list_sessions.return_value = LangfuseSessionsResponse(
             data=sample_sessions,
             meta={},
         )
@@ -1187,9 +1194,8 @@ class TestHandleLangfuseSearchSessions:
         assert data["total_matches"] == 2  # session-1 (5) and session-2 (10)
 
     @pytest.mark.asyncio
-    @patch.object(LangfuseClient, "list_sessions")
-    async def test_search_with_max_traces_filter(self, mock_list_sessions, sample_sessions):
-        mock_list_sessions.return_value = LangfuseSessionsResponse(
+    async def test_search_with_max_traces_filter(self, mock_langfuse_client, sample_sessions):
+        mock_langfuse_client.list_sessions.return_value = LangfuseSessionsResponse(
             data=sample_sessions,
             meta={},
         )
@@ -1202,9 +1208,8 @@ class TestHandleLangfuseSearchSessions:
         assert data["total_matches"] == 2  # session-1 (5) and session-3 (3)
 
     @pytest.mark.asyncio
-    @patch.object(LangfuseClient, "list_sessions")
-    async def test_search_with_min_cost_filter(self, mock_list_sessions, sample_sessions):
-        mock_list_sessions.return_value = LangfuseSessionsResponse(
+    async def test_search_with_min_cost_filter(self, mock_langfuse_client, sample_sessions):
+        mock_langfuse_client.list_sessions.return_value = LangfuseSessionsResponse(
             data=sample_sessions,
             meta={},
         )
@@ -1217,9 +1222,8 @@ class TestHandleLangfuseSearchSessions:
         assert data["total_matches"] == 2  # session-1 (0.50) and session-2 (1.00)
 
     @pytest.mark.asyncio
-    @patch.object(LangfuseClient, "list_sessions")
-    async def test_search_with_max_cost_filter(self, mock_list_sessions, sample_sessions):
-        mock_list_sessions.return_value = LangfuseSessionsResponse(
+    async def test_search_with_max_cost_filter(self, mock_langfuse_client, sample_sessions):
+        mock_langfuse_client.list_sessions.return_value = LangfuseSessionsResponse(
             data=sample_sessions,
             meta={},
         )
@@ -1232,9 +1236,8 @@ class TestHandleLangfuseSearchSessions:
         assert data["total_matches"] == 2  # session-1 (0.50) and session-3 (0.20)
 
     @pytest.mark.asyncio
-    @patch.object(LangfuseClient, "list_sessions")
-    async def test_search_with_combined_filters(self, mock_list_sessions, sample_sessions):
-        mock_list_sessions.return_value = LangfuseSessionsResponse(
+    async def test_search_with_combined_filters(self, mock_langfuse_client, sample_sessions):
+        mock_langfuse_client.list_sessions.return_value = LangfuseSessionsResponse(
             data=sample_sessions,
             meta={},
         )
@@ -1256,9 +1259,8 @@ class TestHandleLangfuseSearchSessions:
         assert data["filters_applied"]["min_cost"] == 0.40
 
     @pytest.mark.asyncio
-    @patch.object(LangfuseClient, "list_sessions")
-    async def test_search_passes_api_filters(self, mock_list_sessions):
-        mock_list_sessions.return_value = LangfuseSessionsResponse(
+    async def test_search_passes_api_filters(self, mock_langfuse_client):
+        mock_langfuse_client.list_sessions.return_value = LangfuseSessionsResponse(
             data=[],
             meta={},
         )
@@ -1272,7 +1274,7 @@ class TestHandleLangfuseSearchSessions:
             }
         )
 
-        mock_list_sessions.assert_called_once_with(
+        mock_langfuse_client.list_sessions.assert_called_once_with(
             limit=25,
             page=2,
             from_timestamp="2025-01-01",
@@ -1280,9 +1282,8 @@ class TestHandleLangfuseSearchSessions:
         )
 
     @pytest.mark.asyncio
-    @patch.object(LangfuseClient, "list_sessions")
-    async def test_search_no_filters_returns_all(self, mock_list_sessions, sample_sessions):
-        mock_list_sessions.return_value = LangfuseSessionsResponse(
+    async def test_search_no_filters_returns_all(self, mock_langfuse_client, sample_sessions):
+        mock_langfuse_client.list_sessions.return_value = LangfuseSessionsResponse(
             data=sample_sessions,
             meta={},
         )

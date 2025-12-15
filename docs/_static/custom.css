@@ -1,0 +1,557 @@
+/* Shepherd MCP - White Monochrome Theme */
+
+/* Import IBM Plex fonts */
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
+
+/* ============================================================================
+   Base Styles
+   ============================================================================ */
+
+:root {
+    --color-black: #000000;
+    --color-dark: #1a1a1a;
+    --color-gray-1: #333333;
+    --color-gray-2: #666666;
+    --color-gray-3: #999999;
+    --color-gray-4: #cccccc;
+    --color-gray-5: #e5e5e5;
+    --color-gray-6: #f0f0f0;
+    --color-gray-7: #f5f5f5;
+    --color-gray-8: #fafafa;
+    --color-white: #ffffff;
+    --font-sans: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-mono: 'IBM Plex Mono', 'SF Mono', 'Monaco', 'Consolas', monospace;
+}
+
+body {
+    font-family: var(--font-sans);
+    color: var(--color-dark);
+    line-height: 1.7;
+    background: var(--color-white);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================================================
+   Typography
+   ============================================================================ */
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    color: var(--color-black);
+    letter-spacing: -0.02em;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}
+
+h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    border-bottom: 2px solid var(--color-black);
+    padding-bottom: 0.5rem;
+}
+
+h2 {
+    font-size: 1.75rem;
+    border-bottom: 1px solid var(--color-gray-5);
+    padding-bottom: 0.4rem;
+}
+
+h3 {
+    font-size: 1.35rem;
+}
+
+h4 {
+    font-size: 1.15rem;
+}
+
+p {
+    margin-bottom: 1.2rem;
+}
+
+/* ============================================================================
+   Links
+   ============================================================================ */
+
+a {
+    color: var(--color-dark);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    transition: all 0.15s ease;
+}
+
+a:hover {
+    color: var(--color-black);
+    text-decoration-thickness: 2px;
+}
+
+a.headerlink {
+    color: var(--color-gray-4);
+    text-decoration: none;
+    padding-left: 0.3em;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+}
+
+h1:hover a.headerlink,
+h2:hover a.headerlink,
+h3:hover a.headerlink,
+h4:hover a.headerlink {
+    opacity: 1;
+}
+
+a.headerlink:hover {
+    color: var(--color-black);
+}
+
+/* ============================================================================
+   Code Blocks
+   ============================================================================ */
+
+code, pre, .pre {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+}
+
+code {
+    background: var(--color-gray-7);
+    padding: 0.2em 0.4em;
+    border-radius: 4px;
+    color: var(--color-dark);
+}
+
+a code {
+    background: transparent;
+    padding: 0;
+}
+
+pre {
+    background: var(--color-gray-8);
+    border: 1px solid var(--color-gray-5);
+    border-radius: 6px;
+    padding: 1rem 1.25rem;
+    overflow-x: auto;
+    line-height: 1.5;
+}
+
+.highlight pre {
+    background: var(--color-gray-8);
+    border: 1px solid var(--color-gray-5);
+}
+
+/* Syntax highlighting - monochrome */
+.highlight .c,
+.highlight .c1,
+.highlight .cm,
+.highlight .cs {
+    color: var(--color-gray-3);
+    font-style: italic;
+}
+
+.highlight .k,
+.highlight .kc,
+.highlight .kd,
+.highlight .kn,
+.highlight .kp,
+.highlight .kr,
+.highlight .kt {
+    color: var(--color-black);
+    font-weight: 600;
+}
+
+.highlight .s,
+.highlight .s1,
+.highlight .s2,
+.highlight .sb,
+.highlight .sc,
+.highlight .sd,
+.highlight .se,
+.highlight .sh,
+.highlight .si,
+.highlight .sr,
+.highlight .ss,
+.highlight .sx {
+    color: var(--color-gray-2);
+}
+
+.highlight .n,
+.highlight .na,
+.highlight .nb,
+.highlight .nc,
+.highlight .nd,
+.highlight .ne,
+.highlight .nf,
+.highlight .ni,
+.highlight .nl,
+.highlight .nn,
+.highlight .no,
+.highlight .nt,
+.highlight .nv,
+.highlight .nx {
+    color: var(--color-dark);
+}
+
+.highlight .o,
+.highlight .ow,
+.highlight .p {
+    color: var(--color-gray-1);
+}
+
+.highlight .m,
+.highlight .mb,
+.highlight .mf,
+.highlight .mh,
+.highlight .mi,
+.highlight .mo {
+    color: var(--color-dark);
+}
+
+.highlight .bp {
+    color: var(--color-gray-2);
+}
+
+/* ============================================================================
+   Sidebar
+   ============================================================================ */
+
+div.sphinxsidebar {
+    background: var(--color-gray-8);
+    border-right: 1px solid var(--color-gray-5);
+    padding: 1.5rem;
+}
+
+div.sphinxsidebar h3,
+div.sphinxsidebar h4 {
+    font-weight: 600;
+    color: var(--color-black);
+    font-size: 1rem;
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+div.sphinxsidebar h3:first-child {
+    margin-top: 0;
+}
+
+div.sphinxsidebar a {
+    color: var(--color-gray-1);
+    text-decoration: none;
+}
+
+div.sphinxsidebar a:hover {
+    color: var(--color-black);
+}
+
+div.sphinxsidebar ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+div.sphinxsidebar ul li {
+    margin: 0.4rem 0;
+}
+
+div.sphinxsidebar p.caption {
+    font-weight: 600;
+    color: var(--color-black);
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Search box */
+div.sphinxsidebar input[type="text"] {
+    font-family: var(--font-sans);
+    border: 1px solid var(--color-gray-4);
+    border-radius: 4px;
+    padding: 0.5rem 0.75rem;
+    width: 100%;
+    background: var(--color-white);
+    transition: border-color 0.15s ease;
+}
+
+div.sphinxsidebar input[type="text"]:focus {
+    outline: none;
+    border-color: var(--color-black);
+}
+
+div.sphinxsidebar input[type="submit"] {
+    font-family: var(--font-sans);
+    background: var(--color-black);
+    color: var(--color-white);
+    border: none;
+    border-radius: 4px;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    font-weight: 500;
+    margin-top: 0.5rem;
+    transition: background 0.15s ease;
+}
+
+div.sphinxsidebar input[type="submit"]:hover {
+    background: var(--color-gray-1);
+}
+
+/* ============================================================================
+   Main Content
+   ============================================================================ */
+
+div.body {
+    padding: 2rem 3rem;
+    max-width: 800px;
+}
+
+div.document {
+    background: var(--color-white);
+}
+
+/* ============================================================================
+   Admonitions
+   ============================================================================ */
+
+div.admonition {
+    background: var(--color-gray-7);
+    border: 1px solid var(--color-gray-5);
+    border-left: 4px solid var(--color-gray-3);
+    border-radius: 4px;
+    padding: 1rem 1.25rem;
+    margin: 1.5rem 0;
+}
+
+div.admonition p.admonition-title {
+    font-weight: 600;
+    color: var(--color-black);
+    margin: 0 0 0.5rem 0;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+div.admonition p:last-child {
+    margin-bottom: 0;
+}
+
+div.warning {
+    border-left-color: var(--color-gray-1);
+    background: var(--color-gray-6);
+}
+
+div.note {
+    border-left-color: var(--color-gray-3);
+}
+
+div.tip,
+div.hint {
+    border-left-color: var(--color-gray-3);
+}
+
+/* ============================================================================
+   Tables
+   ============================================================================ */
+
+table.docutils {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+}
+
+table.docutils th,
+table.docutils td {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--color-gray-5);
+}
+
+table.docutils th {
+    font-weight: 600;
+    color: var(--color-black);
+    background: var(--color-gray-7);
+    border-bottom: 2px solid var(--color-gray-4);
+}
+
+table.docutils tr:hover td {
+    background: var(--color-gray-8);
+}
+
+/* ============================================================================
+   API Documentation
+   ============================================================================ */
+
+dl.py.class,
+dl.py.function,
+dl.py.method,
+dl.py.attribute,
+dl.py.exception {
+    margin: 1.5rem 0;
+    padding: 1.25rem;
+    background: var(--color-gray-8);
+    border: 1px solid var(--color-gray-5);
+    border-radius: 6px;
+}
+
+dl.py dt {
+    font-family: var(--font-mono);
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--color-black);
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--color-gray-5);
+    margin-bottom: 0.75rem;
+}
+
+dl.py dd {
+    margin-left: 0;
+    padding-top: 0.5rem;
+}
+
+dl.py .sig-name {
+    font-weight: 600;
+    color: var(--color-black);
+}
+
+dl.py .sig-param {
+    font-style: normal;
+}
+
+dl.py .property {
+    font-style: italic;
+    color: var(--color-gray-2);
+    margin-right: 0.5em;
+}
+
+/* Field lists (Parameters, Returns, etc.) */
+dl.field-list dt {
+    font-weight: 600;
+    color: var(--color-gray-1);
+    margin-top: 1rem;
+}
+
+dl.field-list dd {
+    margin-left: 1.5rem;
+}
+
+/* ============================================================================
+   Navigation
+   ============================================================================ */
+
+div.related {
+    display: none;
+}
+
+/* Table of contents */
+div.toctree-wrapper ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+div.toctree-wrapper ul li {
+    margin: 0.5rem 0;
+    padding-left: 1rem;
+    border-left: 2px solid var(--color-gray-5);
+}
+
+div.toctree-wrapper ul li a {
+    text-decoration: none;
+    color: var(--color-gray-1);
+}
+
+div.toctree-wrapper ul li a:hover {
+    color: var(--color-black);
+}
+
+/* Contents box */
+div.contents {
+    background: var(--color-gray-8);
+    border: 1px solid var(--color-gray-5);
+    border-radius: 6px;
+    padding: 1rem 1.25rem;
+    margin: 1.5rem 0;
+}
+
+div.contents p.topic-title {
+    font-weight: 600;
+    color: var(--color-black);
+    margin-bottom: 0.75rem;
+}
+
+div.contents ul {
+    margin: 0;
+    padding-left: 1.5rem;
+}
+
+/* ============================================================================
+   Footer
+   ============================================================================ */
+
+div.footer {
+    color: var(--color-gray-2);
+    font-size: 0.9rem;
+    text-align: center;
+    padding: 2rem 0;
+    border-top: 1px solid var(--color-gray-5);
+    margin-top: 3rem;
+}
+
+div.footer a {
+    color: var(--color-gray-1);
+}
+
+/* ============================================================================
+   Responsive
+   ============================================================================ */
+
+@media (max-width: 768px) {
+    div.body {
+        padding: 1rem 1.5rem;
+    }
+    
+    h1 {
+        font-size: 2rem;
+    }
+    
+    h2 {
+        font-size: 1.5rem;
+    }
+    
+    div.sphinxsidebar {
+        width: 100%;
+        position: static;
+        padding: 1rem;
+    }
+    
+    pre {
+        padding: 0.75rem 1rem;
+        font-size: 0.85em;
+    }
+}
+
+/* ============================================================================
+   Print Styles
+   ============================================================================ */
+
+@media print {
+    div.sphinxsidebar {
+        display: none;
+    }
+    
+    div.body {
+        max-width: 100%;
+        padding: 0;
+    }
+    
+    a {
+        text-decoration: none;
+        color: var(--color-black);
+    }
+    
+    pre {
+        border: 1px solid var(--color-gray-4);
+    }
+}
+

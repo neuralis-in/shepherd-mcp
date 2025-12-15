@@ -32,6 +32,10 @@ dev = [
     "build>=1.0.0",
     "twine>=5.0.0",
 ]
+docs = [
+    "sphinx>=7.0.0",
+    "sphinx-autobuild>=2024.0.0",
+]
 
 [project.scripts]
 shepherd-mcp = "shepherd_mcp:main"
@@ -39,7 +43,7 @@ shepherd-mcp = "shepherd_mcp:main"
 [project.urls]
 Homepage = "https://github.com/neuralis/shepherd-mcp"
 Repository = "https://github.com/neuralis/shepherd-mcp"
-Documentation = "https://github.com/neuralis/shepherd-mcp#readme"
+Documentation = "https://neuralis.github.io/shepherd-mcp/"
 
 [build-system]
 requires = ["hatchling"]

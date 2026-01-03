@@ -3,10 +3,6 @@ Providers API Reference
 
 Provider clients for interacting with observability backends.
 
-.. contents:: On this page
-   :local:
-   :depth: 2
-
 Base Provider
 -------------
 

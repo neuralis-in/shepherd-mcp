@@ -4,10 +4,6 @@ Available Tools
 Shepherd MCP provides a comprehensive set of tools for querying and analyzing 
 AI agent sessions. Tools are organized by provider.
 
-.. contents:: On this page
-   :local:
-   :depth: 2
-
 AIOBS (Shepherd) Tools
 ----------------------
 

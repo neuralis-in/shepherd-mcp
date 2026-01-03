@@ -1,0 +1,303 @@
+/* Shepherd MCP Documentation - Custom Styles */
+
+/* Import fonts */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* Root variables */
+:root {
+    --shepherd-cyan: #0ea5e9;
+    --shepherd-cyan-light: #38bdf8;
+    --shepherd-cyan-dark: #0284c7;
+}
+
+/* Typography enhancements */
+body {
+    font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Main content styling */
+.content {
+    line-height: 1.8;
+}
+
+/* Header styling */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    letter-spacing: -0.02em;
+}
+
+h1 {
+    font-size: 2.25rem;
+    margin-bottom: 1.5rem;
+    background: linear-gradient(135deg, var(--color-brand-primary), var(--color-brand-content));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+h2 {
+    font-size: 1.75rem;
+    margin-top: 2.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--color-background-border);
+}
+
+h3 {
+    font-size: 1.35rem;
+    margin-top: 2rem;
+}
+
+/* Code blocks */
+pre {
+    border-radius: 8px !important;
+    padding: 1rem !important;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+code.literal {
+    padding: 0.15em 0.4em;
+    border-radius: 4px;
+    font-size: 0.875em;
+    font-weight: 500;
+}
+
+/* Inline code in light mode */
+html:not(.dark) code.literal {
+    background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+    color: #0369a1;
+    border: 1px solid #bae6fd;
+}
+
+/* Inline code in dark mode */
+html.dark code.literal {
+    background: rgba(56, 189, 248, 0.15);
+    color: #7dd3fc;
+    border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+/* Copy button styling */
+button.copybtn {
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+button.copybtn:hover {
+    background: var(--color-brand-primary) !important;
+    color: white !important;
+}
+
+/* Admonitions (notes, warnings, etc.) */
+.admonition {
+    border-radius: 8px;
+    border-left: 4px solid var(--color-brand-primary);
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.admonition-title {
+    font-weight: 600;
+}
+
+/* Links */
+a {
+    transition: color 0.2s ease;
+}
+
+a:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+/* Sidebar styling */
+.sidebar-brand {
+    padding: 1rem 0;
+}
+
+.sidebar-brand-text {
+    font-weight: 700;
+    font-size: 1.25rem;
+    letter-spacing: -0.02em;
+}
+
+.sidebar-tree .reference {
+    border-radius: 6px;
+    padding: 0.5rem 0.75rem;
+    margin: 0.1rem 0;
+    transition: all 0.15s ease;
+}
+
+.sidebar-tree .current-page > .reference {
+    font-weight: 600;
+    background: linear-gradient(135deg, rgba(14, 165, 233, 0.15), rgba(14, 165, 233, 0.05));
+    border-left: 3px solid var(--color-brand-primary);
+}
+
+/* Table styling */
+table {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+th {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+}
+
+/* Definition lists */
+dt {
+    font-weight: 600;
+    color: var(--color-brand-primary);
+}
+
+dd {
+    margin-left: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+/* API documentation styling */
+.sig {
+    font-family: var(--font-stack--monospace);
+    font-size: 0.95rem;
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+}
+
+.sig-name {
+    color: var(--color-brand-primary);
+    font-weight: 600;
+}
+
+.sig-param {
+    font-style: normal;
+}
+
+/* Method/function descriptions */
+dl.py.method > dd,
+dl.py.function > dd,
+dl.py.class > dd {
+    padding-left: 1.5rem;
+    border-left: 2px solid var(--color-background-border);
+    margin-left: 0;
+}
+
+/* Parameter lists */
+.field-list dt {
+    font-size: 0.9rem;
+    color: var(--color-foreground-secondary);
+}
+
+/* Scrollbar styling (for webkit browsers) */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--color-background-secondary);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--color-background-border);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--color-foreground-muted);
+}
+
+/* Hero section for index page */
+.document h1:first-of-type {
+    text-align: center;
+    font-size: 2.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.document > .section:first-child > p:first-of-type {
+    text-align: center;
+    font-size: 1.25rem;
+    color: var(--color-foreground-secondary);
+    margin-bottom: 2rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 1.75rem;
+    }
+    
+    h2 {
+        font-size: 1.35rem;
+    }
+    
+    h3 {
+        font-size: 1.15rem;
+    }
+    
+    .document h1:first-of-type {
+        font-size: 2rem;
+    }
+}
+
+/* Animation for links and interactive elements */
+.sidebar-tree .reference,
+button,
+a {
+    transition: all 0.15s ease-in-out;
+}
+
+/* Focus styles for accessibility */
+a:focus,
+button:focus {
+    outline: 2px solid var(--color-brand-primary);
+    outline-offset: 2px;
+}
+
+/* TOC styling */
+.toc-tree li {
+    margin: 0.25rem 0;
+}
+
+.toc-tree a {
+    display: block;
+    padding: 0.25rem 0;
+}
+
+/* Badge-like styling for version numbers */
+.versionadded,
+.versionchanged,
+.deprecated {
+    display: inline-block;
+    padding: 0.15em 0.5em;
+    border-radius: 4px;
+    font-size: 0.8em;
+    font-weight: 500;
+}
+
+.versionadded {
+    background: rgba(34, 197, 94, 0.15);
+    color: #22c55e;
+}
+
+.versionchanged {
+    background: rgba(234, 179, 8, 0.15);
+    color: #eab308;
+}
+
+.deprecated {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+}
+
+/* Footer styling */
+.footer {
+    font-size: 0.875rem;
+    color: var(--color-foreground-muted);
+}
+

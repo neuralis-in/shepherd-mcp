@@ -4,10 +4,6 @@ Use Cases
 Shepherd MCP enables powerful debugging and analysis workflows for AI agents. 
 Here are common use cases with example prompts.
 
-.. contents:: On this page
-   :local:
-   :depth: 2
-
 Debugging Failed Runs
 ---------------------
 

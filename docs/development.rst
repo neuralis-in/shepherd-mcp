@@ -4,10 +4,6 @@ Development Guide
 This guide covers how to set up a development environment and contribute to 
 Shepherd MCP.
 
-.. contents:: On this page
-   :local:
-   :depth: 2
-
 Setup
 -----
 
